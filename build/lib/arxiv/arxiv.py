@@ -235,7 +235,7 @@ def slugify(obj):
     return filename
 
 def custom_slugify(obj):
-    # only return object id
+    # Remove special characters from object title
     return osp.splitext(obj.get('pdf_url').split('/')[-1])[0]
 
 def download(obj, dirpath='./', slugify=slugify, verbose=True):
