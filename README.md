@@ -1,6 +1,11 @@
 # arxiv.py [![Python 2.7](https://img.shields.io/badge/python-2.7-blue.svg)](https://www.python.org/downloads/release/python-270/) [![Python 3.6](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
 
-Python wrapper for [the arXiv API](http://arxiv.org/help/api/index).
+Python wrapper for [the arXiv API](http://arxiv.org/help/api/index). This repo is a fork of [`https://github.com/lukasschwab/arxiv.py`](https://github.com/lukasschwab/arxiv.py) with more user-friendly scripts.
+
+## New Functions
+* Progress bar visualization when downloading via `tqdm`
+* Save query results as json file
+* User-friendly python and shell Scripts for daily use w/o writing your own code
 
 ## About arXiv
 
@@ -11,126 +16,106 @@ Python wrapper for [the arXiv API](http://arxiv.org/help/api/index).
 ### Installation
 
 ```bash
-$ pip install arxiv
+git clone https://github.com/greatwallet/arxiv.py
+cd arxiv.py
+python setup.py install
 ```
 
 Verify the installation with
 
 ```bash
-$ python setup.py test
+python setup.py test
 ```
 
-In your Python script, include the line
+### Usage of Python script [`query_and_download.py`](https://github.com/greatwallet/arxiv.py/blob/master/query_and_download.py)
 
-```python
-import arxiv
+[`query_and_download.py`](https://github.com/greatwallet/arxiv.py/blob/master/query_and_download.py) is a user-friendly script with arguments. The usage lies below:
+```
+$ python query_and_download.py --help
+usage: query_and_download.py [-h] [--query QUERY]
+                             [--id-list [ID_LIST [ID_LIST ...]]]
+                             [--url-list [URL_LIST [URL_LIST ...]]]
+                             [--max-results MAX_RESULTS] [--start START]
+                             [--sort-by {relevance,lastUpdatedDate,submittedDate}]
+                             [--order {descending,ascending}] [--prune]
+                             [--max-chunk-results MAX_CHUNK_RESULTS]
+                             [--query-save-path QUERY_SAVE_PATH] [--silent]
+                             [--download] [--full-name]
+                             [--download-directory DOWNLOAD_DIRECTORY]
+
+Perform Query and Download from Arxiv
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --query QUERY, -q QUERY
+                        An arXiv query string. Format documented
+                        https://arxiv.org/help/api/user-manual#Quickstart.
+                        Default: ""
+  --id-list [ID_LIST [ID_LIST ...]], -i [ID_LIST [ID_LIST ...]]
+                        List of arXiv record IDs. Default: []
+  --url-list [URL_LIST [URL_LIST ...]], -u [URL_LIST [URL_LIST ...]]
+                        List of url to be downloaded, would be overridden if
+                        either query or id-list is specified. Default: []
+  --max-results MAX_RESULTS, -m MAX_RESULTS
+                        The maximum number of results returned by the query.
+                        Default: 10
+  --start START, -idx START
+                        The offset of the first returned object from the arXiv
+                        query results. Default: 0
+  --sort-by {relevance,lastUpdatedDate,submittedDate}, -sb {relevance,lastUpdatedDate,submittedDate}
+                        The arXiv field by which the result should be sorted,
+                        which can be can be 'relevance', 'lastUpdatedDate',
+                        'submittedDate'. Default: 'relevance'
+  --order {descending,ascending}, -o {descending,ascending}
+                        The sorting order, which can be 'descending' or
+                        'ascending'. Default: 'descending'
+  --prune, -p           If specified, received abstract objects will be
+                        simplified
+  --max-chunk-results MAX_CHUNK_RESULTS, -mcr MAX_CHUNK_RESULTS
+                        The maximum number of abstracts ot be retrieved by a
+                        single internal request to the arXiv API. Default:
+                        1000
+  --query-save-path QUERY_SAVE_PATH, -qsp QUERY_SAVE_PATH
+                        If specified, The path of the query results saved as
+                        json. Default: None
+  --silent, -st         If specified, the query results will not be printed to
+                        screen
+  --download, -d        If specified, the query results will be downloaded
+  --full-name, -f       If specified, the PDF will be saved as
+                        `id`+`caption`.pdf, otherwise `id`.pdf
+  --download-directory DOWNLOAD_DIRECTORY, -dp DOWNLOAD_DIRECTORY
+                        The directory of the PDFs saved in, only valid when
+                        `download` is specified. Default: ./
+
+```
+<b>Note: </b> If you plan to download PDFs in batches, please keep in mind that a rapid visiting action or a huge amount of downloading may trigger the alarm of arxiv api, thus raising HTTP error.
+
+### Usage of Shell Scripts
+
+I also provide shell scripts for simplifing the arguments.
+
+```
+# make 3 queries and print results to screen 
+# example
+export QUERY="here is your query"
+sh query.sh $QUERY
+
+# make 10 queries silently and save the results as pretty-looking json file
+# example
+export QUERY="here is your query"
+export JSON_SAVE_PATH="your path for query results"
+sh query_and_save.sh $QUERY $JSON_SAVE_PATH
+
+# Download single link and save pdf
+# example 1: save to ./
+export URL="your pdf url, e.g. 'https://arxiv.org/pdf/1804.00175.pdf'"
+sh download_link.sh $URL
+# example 2: save to custom path
+export URL="your pdf url"
+export PDF_DIR="your directory for saving pdf"
+sh download_link.sh $URL $PDF_DIR
 ```
 
-### Query
+## Contact
+If you have any problems, please contact [`cxt_tsinghua@126.com`](cxt_tsinghua@126.com) or refer to the original repo [`https://github.com/lukasschwab/arxiv.py`](https://github.com/lukasschwab/arxiv.py).
 
-```python
-arxiv.query(query="",
-            id_list=[],
-            max_results=None,
-            start = 0,
-            sort_by="relevance",
-            sort_order="descending",
-            prune=True,
-            iterative=False,
-            max_chunk_results=1000)
-```
-
-| **Argument**   | **Type**        | **Default**    |
-|----------------|-----------------|----------------|
-| `query`        | string          | `""`           |
-| `id_list`      | list of strings | `[]`           |
-| `max_results`  | int             | 10             |
-| `start`        | int             | 0              |
-| `sort_by`      | string          | `"relevance"`  |
-| `sort_order`   | string          | `"descending"` |
-| `prune`        | boolean         | `True`         |
-| `iterative`    | boolean         | `False`        |
-| `max_chunk_results` | int        | 1000           |
-
-+ `query`: an arXiv query string. Format documented [here](https://arxiv.org/help/api/user-manual#Quickstart).
-  + **Note:** multi-field queries must be space-delimited. `au:balents_leon AND cat:cond-mat.str-el` is valid; `au:balents_leon+AND+cat:cond-mat.str-el` is *not* valid.
-
-+ `id_list`: list of arXiv record IDs (typically of the format `"0710.5765v1"`).
-
-+ `max_results`: the maximum number of results returned by the query.
-
-+ `start`: the offset of the first returned object from the arXiv query results.
-
-+ `sort_by`: the arXiv field by which the result should be sorted.
-
-+ `sort_order`: the sorting order, i.e. "ascending", "descending" or None.
-
-+ `prune`: when `True`, received abstract objects will be simplified.
-
-+ `iterative`: when `True`, `query()` will return an iterator. Otherwise, `query()` iterates internally and returns the full list of results.
-
-+ `max_chunk_results`: the maximum number of abstracts ot be retrieved by a single internal request to the arXiv API.
-
-**Query examples:**
-
-```python
-import arxiv
-
-# Keyword queries
-arxiv.query(query="quantum", max_results=100)
-# Multi-field queries
-arxiv.query(query="au:balents_leon AND cat:cond-mat.str-el")
-# Get single record by ID
-arxiv.query(id_list=["1707.08567"])
-# Get multiple records by ID
-arxiv.query(id_list=["1707.08567", "1707.08567"])
-
-# Get interator over query results
-result = arxiv.query(query="quantum", max_chunk_results=10, iterative=True)
-for paper in result():
-   print(paper)
-```
-
-For a more detailed description of the interaction between `query` and `id_list`, see [this section of the arXiv documentation](https://arxiv.org/help/api/user-manual#search_query_and_id_list).
-
-### Download article PDF
-
-```python
-arxiv.download(obj, dirpath="./", slugify=arxiv.slugify)
-```
-
-| **Argument** | **Type** | **Default** | **Required?** |
-|--------------|----------|-------------|---------------|
-| `obj`        | dict     | N/A         | Yes           |
-| `dirpath`    | string   | `"./"`      | No            |
-| `slugify`    | function | `arxiv.slugify` | No        |
-
-+ `obj` is a result object, one of a list returned by query(). `obj` must at minimum contain values corresponding to `pdf_url` and `title`.
-
-+ `dirpath` is the relative directory path to which the downloaded PDF will be saved. It defaults to the present working directory.
-
-+ `slugify` is a function that processes `obj` into a filename. By default, `arxiv.download(obj)` prepends the object ID to the object title.
-
-```python
-import arxiv
-# Query for a paper of interest, then download
-paper = arxiv.query(id_list=["1707.08567"])[0]
-arxiv.download(paper)
-# You can skip the query step if you have the paper info!
-paper2 = {"pdf_url": "http://arxiv.org/pdf/1707.08567v1",
-          "title": "The Paper Title"}
-arxiv.download(paper2)
-
-# Returns the object id
-def custom_slugify(obj):
-    return obj.get('id').split('/')[-1]
-
-# Download with a specified slugifier function
-arxiv.download(paper, slugify=custom_slugify)
-```
-
-## Contributors
-
-<a href="https://github.com/lukasschwab/arxiv.py/graphs/contributors">
-  <img src="https://contributors-img.firebaseapp.com/image?repo=lukasschwab/arxiv.py" />
-</a>
