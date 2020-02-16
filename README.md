@@ -6,6 +6,7 @@ Python wrapper for [the arXiv API](http://arxiv.org/help/api/index). This repo i
 * Progress bar visualization when downloading via `tqdm`
 * Save query results as json file
 * User-friendly python and shell Scripts for daily use w/o writing your own code
+* Add `cmd` scripts for Windows
 
 ## About arXiv
 
@@ -114,6 +115,22 @@ sh download_link.sh $URL
 export URL="your pdf url"
 export PDF_DIR="your directory for saving pdf"
 sh download_link.sh $URL $PDF_DIR
+```
+
+### Usage of CMD Scripts
+The functions are the same as the shell namesakes 
+```
+REM Windows Powershell or cmd
+set QUERY="here is your query"
+.\query.cnd %QUERY%
+
+set QUERY="here is your query"
+set JSON_SAVE_PATH="your path for query results"
+.\query_and_save.cmd %QUERY% %JSON_SAVE_PATH%
+
+set URL="your pdf url"
+set PDF_DIR="your directory for saving pdf"
+.\download_link.cmd %URL% %PDF_DIR%
 ```
 
 ## Contact
